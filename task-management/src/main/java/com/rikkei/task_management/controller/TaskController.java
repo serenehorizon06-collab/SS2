@@ -3,10 +3,9 @@ package com.rikkei.task_management.controller;
 import com.rikkei.task_management.model.Task;
 import com.rikkei.task_management.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,5 +35,20 @@ public class TaskController {
         }
 
         return ResponseEntity.ok(tasks);
+    }
+
+    @PostMapping("/tasks")
+    public ResponseEntity<?> createTask(@RequestBody Task newTask) {
+        Task savedTask = taskService.createTask(newTask);
+
+        if (savedTask == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("User assignedTo không tồn tại");
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedTask);
     }
 }
