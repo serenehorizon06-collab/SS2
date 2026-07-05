@@ -3,10 +3,13 @@ package com.rikkei.task_management.controller;
 import com.rikkei.task_management.model.User;
 import com.rikkei.task_management.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -19,7 +22,19 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public List<User> findAllUsers() {
-        return userService.findAllUsers();
+    public ResponseEntity<List<User>> findAllUsers(
+            @RequestParam(required = false) String search) {
+
+        List<User> users = userService.findAllUsers();
+
+        if (search != null && !search.isEmpty()) {
+            users = users.stream()
+                    .filter(user -> user.getUsername()
+                            .toLowerCase()
+                            .contains(search.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok(users);
     }
 }
